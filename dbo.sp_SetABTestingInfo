@@ -1,0 +1,71 @@
+CREATE PROCEDURE dbo.sp_SetABTestingInfo 
+  @TestName NVARCHAR(100),
+  @Src NVARCHAR(50),
+  @ControlPg NVARCHAR(50),
+  @ChallengerPg NVARCHAR(50),
+  @Domain NVARCHAR(250),
+  @Path NVARCHAR(100),
+  @IsTestEnding BIT,
+  @Winner NVARCHAR(50)
+AS 
+  DECLARE @DomainId INT
+  DECLARE @SiteId INT
+  DECLARE @ChampPageId INT
+  DECLARE @TestId INT
+  DECLARE @ChallengerPageId INT
+  DECLARE @DeviceType INT = NULL
+  DECLARE @PgNum INT = NULL
+BEGIN TRANSACTION
+  BEGIN TRY
+    SELECT @DomainId = vs.DomainId FROM v_Sites vs WHERE vs.Domain = @Domain AND vs.Path = @Path
+    SELECT @SiteId = vs.SiteId FROM v_Sites vs WHERE vs.Domain = @Domain AND vs.Path = @Path 
+    SELECT @ChampPageId = vp.PageId FROM v_Pages vp WHERE vp.DomainId = @DomainId AND vp.SiteId = @SiteId AND @ControlPg = vp.Pg
+    SELECT @TestId = a.Id FROM ABTest a WHERE @TestName = a.TestName AND @Src = a.SrcValue                                                
+    SET @DeviceType = dbo.GetDeviceType(@DeviceType, @ChallengerPg)  
+    SET @PgNum = dbo.RemovePgValueText(@PgNum, @ChallengerPg)
+
+    IF @TestId IS NULL
+      BEGIN
+          EXEC sp_CreateSitePage @SiteId = @SiteId
+                                ,@Name = @TestName
+                                ,@PgNum = @PgNum
+                                ,@DeviceTypeFlag = @DeviceType
+          SELECT @ChallengerPageId = p.Id FROM Page p WHERE @TestName = p.Name AND @ChallengerPg = p.Pg AND @DeviceType = p.DeviceTypeId
+          EXEC sp_CreateABTest @ControlPageId = @ChampPageId
+                              ,@ChallengerPageId = @ChallengerPageId
+                              ,@TestName = @TestName
+                              ,@SrcValue = @Src   
+      END
+    ELSE IF @IsTestEnding = 1 AND @Winner = @ChallengerPg
+      BEGIN
+          UPDATE Page
+            SET IsChamp = 0
+            WHERE SiteId = @SiteId AND Pg = @ControlPg AND DeviceTypeId = @DeviceType;
+
+          UPDATE Page 
+            SET IsChamp = 1
+            WHERE SiteId = @SiteId AND Pg = @ChallengerPg AND DeviceTypeId = @DeviceType;
+
+          UPDATE ABTest 
+            SET Enabled = 0
+            WHERE Id = @TestId
+
+          UPDATE ABTestLookup 
+            SET Enabled = 0
+            WHERE TestId = @TestId
+      END
+      ELSE
+        BEGIN
+              UPDATE ABTestLookup 
+              SET Enabled = 0
+              WHERE TestId = @TestId
+        END
+    COMMIT TRANSACTION
+END TRY
+BEGIN CATCH
+  ROLLBACK
+    END CATCH
+
+ 
+  
+GO
