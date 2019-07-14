@@ -13,37 +13,25 @@ namespace RMI.MondayComDashboard.Controllers
     {
         static string pulseUrl = "https://api.monday.com/v1/boards/213532600/pulses.json?api_key=11f160f3214b9584da1c06f27871bee3";
         static string columnUrl = "https://api.monday.com/v1/boards/213532600/columns.json?api_key=11f160f3214b9584da1c06f27871bee3";
+        static Helpers threadHelp = new Helpers();
 
         // POST: api/Monday
         public void Post(MondayTest pulse) {
-            try
-            {
-                Task.Delay(60000); 
-                if(pulse.testType.ToString() == "RMI" && pulse.boardName.ToString() == "Done" || pulse.boardName.ToString() == "Testing")             
-                {
-                    DataBase db = new DataBase();
-                    db.AddNewTest(pulse);
-                }
-            }
-            catch (Exception ex)
-            {
+            try {
+                threadHelp.VerifyingPulses(pulse);
+            } catch (Exception ex) {
                 Console.WriteLine(ex.Message);
             }
         }
 
-        public async Task<List<LandingPages>> Get()
-        {
-            using (HttpClient client = new HttpClient())
-            {
+        public async Task<List<LandingPages>> Get() {
+            using (HttpClient client = new HttpClient()) {
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                using (HttpResponseMessage boardResponse = await client.GetAsync(pulseUrl))
-                {
-                    using (HttpResponseMessage columnResponse = await client.GetAsync(columnUrl))
-                    {
-                        if (boardResponse.IsSuccessStatusCode && columnResponse.IsSuccessStatusCode)
-                        {
+                using (HttpResponseMessage boardResponse = await client.GetAsync(pulseUrl)) {
+                    using (HttpResponseMessage columnResponse = await client.GetAsync(columnUrl)) {
+                        if (boardResponse.IsSuccessStatusCode && columnResponse.IsSuccessStatusCode) {
                             var jsonResult = await boardResponse.Content.ReadAsStringAsync();
                             var landingPages = LandingPages.FromJson(jsonResult);
                             var columnResult = await columnResponse.Content.ReadAsStringAsync();
@@ -52,13 +40,9 @@ namespace RMI.MondayComDashboard.Controllers
                             List<LandingPages> pulseResult = new List<LandingPages>();
                             testPage.GetTestingResults(pulseResult, columns, landingPages);
                             return pulseResult;
-                        }
-                        else if (!boardResponse.IsSuccessStatusCode)
-                        {
+                        } else if (!boardResponse.IsSuccessStatusCode) {
                             throw new Exception(boardResponse.ReasonPhrase);
-                        }
-                        else
-                        {
+                        } else {
                             throw new Exception(columnResponse.ReasonPhrase);
                         }
                     }

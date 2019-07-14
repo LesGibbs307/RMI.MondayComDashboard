@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
-namespace RMI.MondayComDashboard.Models
-{
-    public partial class Columns
-    {
+namespace RMI.MondayComDashboard.Models {
+    public partial class Columns {
         [JsonProperty("id")]
         public string Id { get; set; }
 
@@ -22,12 +17,10 @@ namespace RMI.MondayComDashboard.Models
 
         [JsonProperty("labels", NullValueHandling = NullValueHandling.Ignore)]
         public Dictionary<string, string> Labels { get; set; }
-
         [JsonProperty("labels_positions_v2", NullValueHandling = NullValueHandling.Ignore)]
         public Dictionary<string, long> LabelsPositionsV2 { get; set; }
 
-        public string[] GetColumnIndex(List<Columns> columns, string[] test)
-        {
+        public string[] GetColumnIndex(List<Columns> columns, string[] test) {
             foreach (var column in columns) {
                 if (column.Labels != null) {
                     foreach(var label in column.Labels) {

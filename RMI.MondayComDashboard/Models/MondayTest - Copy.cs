@@ -2,36 +2,45 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Text.RegularExpressions;
 using System.Web;
 
-namespace RMI.MondayComDashboard.Models {
-   public enum Winner {
-        None = 50,
-        Control = 100,
-        Challenger = 101,
-        Iterative = 102,
-        Malfunction = 103
+namespace RMI.MondayComDashboard.Models
+{
+   enum Winner {
+        Champ,
+        Challenger,
+        Iterative,
+        Malfunction
     }
 
-    public enum TestType {
-        None = 50,
-        Optimize = 100,
-        RMI = 101
+    public enum TestType
+    {
+        Optimize,
+        RMI        
     }
 
-    public enum Status {
-        None = 50,
-        Champ = 100,
-        Complete = 101,
-        Paused = 102,
-        Designed = 103,
-        Developed = 104,
-        PreTest = 105,
-        QA = 106,
-        Testing = 107
+    //public enum BoardName
+    //{
+    //    Done,
+    //    PreTest,
+    //    Testing
+    //}
+
+    public enum Status
+    {
+        Champ,
+        Complete,
+        Designed,
+        Developed,
+        Paused,
+        PreTest,
+        QA,
+        Testing
     }
 
-    public class MondayTest {
+    public class MondayTest
+    {
         [JsonProperty("pulseUrl")]
         public string pulseUrl { get; set; }
 
@@ -57,30 +66,35 @@ namespace RMI.MondayComDashboard.Models {
         public Status status { get; set; }
 
         [JsonProperty("winner")]
-        public Winner winner { get; set; }
+        Winner winner { get; set; }
 
         [JsonProperty("columnInfo")]
-        public string columnInfo { get; set; }
+        public List<Columns> columnInfo { get; set; }
 
-        public string GetPgValue(string url) {
+        public string GetPgValue(string url)
+        {
             Uri uri = new Uri(url);
             NameValueCollection query = HttpUtility.ParseQueryString(uri.Query);
             string pg = query["pg"];
             return pg;
         }
 
-        public string CleanUrl(string url) {
+        public string CleanUrl(string url)
+        {
             Uri uri = new Uri(url);
             url = uri.Authority;
             return url;
         }
 
-        public string DetermineWinner(string champPg, string challengerPg) {
-            string winnerResult = this.winner.ToString();
-            if(winnerResult == "Control" || winnerResult == "None") {
-                return champPg;
-            } else {
+        public string DetermineWinner(string champPg, string challengerPg)
+        {
+            if(this.winner.ToString() == "Challenger")
+            {
                 return challengerPg;
+            }
+            else
+            {
+                return champPg;
             }
         }
 

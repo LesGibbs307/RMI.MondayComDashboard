@@ -162,12 +162,12 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MondayController.cs" />
-    <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="DbHelpers.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers.cs" />
     <Compile Include="Models\Columns.cs" />
-    <Compile Include="Models\DataBase.cs" />
     <Compile Include="Models\Monday.cs" />
     <Compile Include="Models\MondayTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
