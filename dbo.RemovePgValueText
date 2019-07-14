@@ -1,0 +1,12 @@
+CREATE FUNCTION dbo.RemovePgValueText(@PgNum AS INT, @ChallengerPg AS NVARCHAR(50))
+RETURNS INT
+  AS
+  BEGIN
+    DECLARE @PgString AS NVARCHAR(50)
+      SET @PgString = '%[^0-9]%'
+        WHILE PATINDEX(@PgString, @ChallengerPg) > 0
+  	      SET @ChallengerPg = STUFF(@ChallengerPg, PatIndex(@PgString, @ChallengerPg), 1, '')
+          SET @PgNum = CONVERT(INT, @ChallengerPg)          
+          RETURN @PgNum
+  END
+GO

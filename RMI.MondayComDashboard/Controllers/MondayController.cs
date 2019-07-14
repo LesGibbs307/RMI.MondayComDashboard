@@ -1,4 +1,4 @@
-﻿using RMI.MondayComDashboard.Models;
+using RMI.MondayComDashboard.Models;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;

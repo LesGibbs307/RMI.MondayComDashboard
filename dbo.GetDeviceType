@@ -1,0 +1,15 @@
+CREATE FUNCTION dbo.GetDeviceType (@DeviceType AS INT, @ChallengerPg AS NVARCHAR(50))
+RETURNS INT
+AS
+BEGIN
+  IF @ChallengerPg LIKE '%mlp%'
+    BEGIN
+      SET @DeviceType = 2
+    END
+  ELSE
+    BEGIN
+      SET @DeviceType = 1
+    END
+  RETURN @DeviceType
+  END  
+GO
