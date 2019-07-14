@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using RMI.MondayComDashboard.Models;
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,8 @@ namespace RMI.MondayComDashboard {
                     DbHelpers dbHelpers = new DbHelpers();
                     string testType = pulse.testType.ToString();
                     string status = pulse.status.ToString();
-                    if (testType == "RMI" && status == "Complete" || status == "Testing") {
+                    bool thisStatus = status == "Complete" || status == "Testing" ? true : false;
+                    if (testType == "RMI" && thisStatus == true) {
                         dbHelpers.AddNewTest(pulse);
                     }
                 }
