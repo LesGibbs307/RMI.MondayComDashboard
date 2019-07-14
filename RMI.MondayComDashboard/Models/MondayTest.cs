@@ -6,7 +6,7 @@ using System.Web;
 
 namespace RMI.MondayComDashboard.Models {
    public enum Winner {
-        None = 50,
+        None = 50, 
         Control = 100,
         Challenger = 101,
         Iterative = 102,
